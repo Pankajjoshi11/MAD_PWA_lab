@@ -1,0 +1,163 @@
+import 'package:flutter/material.dart';
+import 'dart:math';
+
+void main() {
+  runApp(CalculatorApp());
+}
+
+class CalculatorApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Simple Calculator',
+      home: CalculatorHomePage(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class CalculatorHomePage extends StatefulWidget {
+  @override
+  _CalculatorHomePageState createState() => _CalculatorHomePageState();
+}
+
+class _CalculatorHomePageState extends State<CalculatorHomePage> {
+  String _input = '';
+  String _result = '';
+
+  void _buttonPressed(String value) {
+    setState(() {
+      if (value == 'C') {
+        _input = '';
+        _result = '';
+      } else if (value == '=') {
+        _result = _evaluate(_input);
+      } else {
+        _input += value;
+      }
+    });
+  }
+
+  String _evaluate(String expression) {
+    try {
+      String finalExp = expression.replaceAll('×', '*').replaceAll('÷', '/');
+      List<String> tokens = _tokenize(finalExp);
+      double result = _compute(tokens);
+      return result.toStringAsFixed(2);
+    } catch (e) {
+      return 'Error';
+    }
+  }
+
+  List<String> _tokenize(String exp) {
+    List<String> tokens = [];
+    String number = '';
+    for (int i = 0; i < exp.length; i++) {
+      String char = exp[i];
+      if ('0123456789.'.contains(char)) {
+        number += char;
+      } else {
+        if (number.isNotEmpty) {
+          tokens.add(number);
+          number = '';
+        }
+        tokens.add(char);
+      }
+    }
+    if (number.isNotEmpty) tokens.add(number);
+    return tokens;
+  }
+
+  double _compute(List<String> tokens) {
+    // Support for +, -, *, /
+    List<String> ops = [];
+    List<double> vals = [];
+
+    for (var token in tokens) {
+      if (double.tryParse(token) != null) {
+        vals.add(double.parse(token));
+      } else if (token == '+' || token == '-' || token == '*' || token == '/') {
+        while (ops.isNotEmpty && _precedence(ops.last) >= _precedence(token)) {
+          _applyOperation(ops, vals);
+        }
+        ops.add(token);
+      }
+    }
+
+    while (ops.isNotEmpty) {
+      _applyOperation(ops, vals);
+    }
+
+    return vals.isNotEmpty ? vals.last : 0;
+  }
+
+  void _applyOperation(List<String> ops, List<double> vals) {
+    double b = vals.removeLast();
+    double a = vals.removeLast();
+    String op = ops.removeLast();
+    double res = 0;
+    if (op == '+') res = a + b;
+    else if (op == '-') res = a - b;
+    else if (op == '*') res = a * b;
+    else if (op == '/') res = a / b;
+    vals.add(res);
+  }
+
+  int _precedence(String op) {
+    if (op == '+' || op == '-') return 1;
+    if (op == '*' || op == '/') return 2;
+    return 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final buttons = [
+      ['7', '8', '9', '÷'],
+      ['4', '5', '6', '×'],
+      ['1', '2', '3', '-'],
+      ['C', '0', '=', '+'],
+    ];
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Calculator')),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(24),
+              alignment: Alignment.bottomRight,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(_input, style: TextStyle(fontSize: 28, color: Colors.grey[600])),
+                  SizedBox(height: 10),
+                  Text(_result, style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          ),
+          ...buttons.map((row) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: row.map((btn) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: () => _buttonPressed(btn),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      minimumSize: Size(70, 70),
+                      shape: CircleBorder(),
+                    ),
+                    child: Text(btn, style: TextStyle(fontSize: 24)),
+                  ),
+                );
+              }).toList(),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+}
