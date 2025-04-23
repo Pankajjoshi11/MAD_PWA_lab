@@ -1,0 +1,173 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: HomePage(),
+    debugShowCheckedModeBanner: false,
+  ));
+}
+
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return TemperatureConverterPage();
+  }
+}
+
+// =================== Temperature Converter Page =====================
+class TemperatureConverterPage extends StatefulWidget {
+  @override
+  _TemperatureConverterPageState createState() => _TemperatureConverterPageState();
+}
+
+class _TemperatureConverterPageState extends State<TemperatureConverterPage> {
+  double inputTemp = 0.0;
+  String selectedUnit = "Celsius";
+  double convertedTemp = 0.0;
+
+  void convert() {
+    setState(() {
+      if (selectedUnit == "Celsius") {
+        convertedTemp = (inputTemp * 9 / 5) + 32;
+      } else {
+        convertedTemp = (inputTemp - 32) * 5 / 9;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Temperature Converter")),
+      drawer: AppDrawer(),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            TextField(
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: "Enter Temperature"),
+              onChanged: (value) {
+                inputTemp = double.tryParse(value) ?? 0.0;
+              },
+            ),
+            DropdownButton<String>(
+              value: selectedUnit,
+              items: ["Celsius", "Fahrenheit"]
+                  .map((unit) => DropdownMenuItem(value: unit, child: Text(unit)))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedUnit = value!;
+                });
+              },
+            ),
+            ElevatedButton(
+              onPressed: convert,
+              child: Text("Convert"),
+            ),
+            SizedBox(height: 20),
+            Text("Converted Temperature: ${convertedTemp.toStringAsFixed(2)} ${selectedUnit == "Celsius" ? "Fahrenheit" : "Celsius"}"),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// =================== Age Calculator Page =====================
+class AgeCalculatorPage extends StatefulWidget {
+  @override
+  _AgeCalculatorPageState createState() => _AgeCalculatorPageState();
+}
+
+class _AgeCalculatorPageState extends State<AgeCalculatorPage> {
+  DateTime? selectedDate;
+  int age = 0;
+
+  void calculateAge() {
+    if (selectedDate == null) return;
+    final now = DateTime.now();
+    age = now.year - selectedDate!.year;
+    if (now.month < selectedDate!.month ||
+        (now.month == selectedDate!.month && now.day < selectedDate!.day)) {
+      age--;
+    }
+    setState(() {});
+  }
+
+  Future<void> pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+        calculateAge();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Age Calculator")),
+      drawer: AppDrawer(),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: pickDate,
+              child: Text("Select Date of Birth"),
+            ),
+            SizedBox(height: 20),
+            if (selectedDate != null)
+              Text("Selected Date: ${DateFormat('yyyy-MM-dd').format(selectedDate!)}"),
+            SizedBox(height: 20),
+            Text("Your Age: $age years"),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// =================== Drawer Widget =====================
+class AppDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(color: Colors.blue),
+            child: Text("Menu", style: TextStyle(fontSize: 24, color: Colors.white)),
+          ),
+          ListTile(
+            title: Text("Temperature Converter"),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => TemperatureConverterPage()),
+              );
+            },
+          ),
+          ListTile(
+            title: Text("Age Calculator"),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => AgeCalculatorPage()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
