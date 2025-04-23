@@ -1,0 +1,35 @@
+void main() {
+  // Hardcoded list of integers
+  List<int> numbers = [12, 45, 32, 9, 87, 21, 67];
+
+  print("Original List: $numbers");
+  print("Total: ${getTotal(numbers)}");
+  print("Highest: ${getHighest(numbers)}");
+  print("Lowest: ${getLowest(numbers)}");
+  print("Average: ${getAverage(numbers)}");
+  print("Median: ${getMedian(numbers)}");
+}
+
+// Function to get total
+int getTotal(List<int> nums) => nums.reduce((a, b) => a + b);
+
+// Function to get highest
+int getHighest(List<int> nums) => nums.reduce((a, b) => a > b ? a : b);
+
+// Function to get lowest
+int getLowest(List<int> nums) => nums.reduce((a, b) => a < b ? a : b);
+
+// Function to get average
+double getAverage(List<int> nums) => getTotal(nums) / nums.length;
+
+// Function to get median
+double getMedian(List<int> nums) {
+  List<int> sorted = List.from(nums)..sort();
+  int middle = sorted.length ~/ 2;
+
+  if (sorted.length % 2 == 1) {
+    return sorted[middle].toDouble();
+  } else {
+    return (sorted[middle - 1] + sorted[middle]) / 2;
+  }
+}

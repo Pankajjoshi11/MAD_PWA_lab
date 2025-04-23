@@ -1,0 +1,88 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class Song {
+  final String name;
+  final String singer;
+  final String category;
+  final String imageUrl;
+
+  Song({
+    required this.name,
+    required this.singer,
+    required this.category,
+    required this.imageUrl,
+  });
+}
+
+class MyApp extends StatelessWidget {
+  final List<Song> songs = [
+    Song(name: "Shape of You", singer: "Ed Sheeran", category: "Pop", imageUrl: "https://via.placeholder.com/100"),
+    Song(name: "Blinding Lights", singer: "The Weeknd", category: "R&B", imageUrl: "https://via.placeholder.com/100"),
+    Song(name: "Levitating", singer: "Dua Lipa", category: "Pop", imageUrl: "https://via.placeholder.com/100"),
+    Song(name: "Believer", singer: "Imagine Dragons", category: "Rock", imageUrl: "https://via.placeholder.com/100"),
+    Song(name: "Perfect", singer: "Ed Sheeran", category: "Romantic", imageUrl: "https://via.placeholder.com/100"),
+    Song(name: "Senorita", singer: "Shawn Mendes", category: "Latin", imageUrl: "https://via.placeholder.com/100"),
+    Song(name: "Peaches", singer: "Justin Bieber", category: "Pop", imageUrl: "https://via.placeholder.com/100"),
+    Song(name: "Let Me Down Slowly", singer: "Alec Benjamin", category: "Indie", imageUrl: "https://via.placeholder.com/100"),
+    Song(name: "Bad Guy", singer: "Billie Eilish", category: "Alt Pop", imageUrl: "https://via.placeholder.com/100"),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: SongListPage(songs: songs),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class SongListPage extends StatelessWidget {
+  final List<Song> songs;
+
+  SongListPage({required this.songs});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Song list")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView.builder(
+          itemCount: songs.length,
+          itemBuilder: (context, index) {
+            final song = songs[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Song Image
+                  Container(
+                    width: 100,
+                    height: 100,
+                    color: Colors.grey[300],
+                    child: Image.network(song.imageUrl, fit: BoxFit.cover),
+                  ),
+                  SizedBox(width: 16),
+                  // Song details
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Song Name: ${song.name}", style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text("Singer: ${song.singer}"),
+                      Text("Category: ${song.category}"),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

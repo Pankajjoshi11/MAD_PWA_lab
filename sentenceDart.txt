@@ -1,0 +1,60 @@
+void main() {
+  // Hardcoded input sentence (since user input is not supported in DartPad)
+  String sentence = "This is a sample sentence for testing Dart functionality.";
+
+  print("Original Sentence: $sentence");
+  print("Number of characters: ${countCharacters(sentence)}");
+  print("Number of words: ${countWords(sentence)}");
+  print("Reversed sentence: ${reverseSentence(sentence)}");
+}
+
+// Function to count characters
+int countCharacters(String sentence) {
+  return sentence.length;
+}
+
+// Function to count words
+int countWords(String sentence) {
+  List<String> words = sentence.trim().split(RegExp(r'\s+'));
+  return words.length;
+}
+
+// Function to reverse the sentence (character-wise)
+String reverseSentence(String sentence) {
+  return sentence.split('').reversed.join();
+}
+
+--------------------------------------------------------------------------------
+import 'dart:io';
+
+void main() {
+  // Accepting user input
+  print("Enter a long sentence:");
+  String? sentence = stdin.readLineSync();
+
+  if (sentence == null || sentence.trim().isEmpty) {
+    print("No sentence entered.");
+    return;
+  }
+
+  // Call functions
+  print("Number of characters: ${countCharacters(sentence)}");
+  print("Number of words: ${countWords(sentence)}");
+  print("Reversed sentence: ${reverseSentence(sentence)}");
+}
+
+// Function to count characters
+int countCharacters(String sentence) {
+  return sentence.length;
+}
+
+// Function to count words
+int countWords(String sentence) {
+  List<String> words = sentence.trim().split(RegExp(r'\s+'));
+  return words.length;
+}
+
+// Function to reverse the sentence
+String reverseSentence(String sentence) {
+  return sentence.split('').reversed.join();
+}

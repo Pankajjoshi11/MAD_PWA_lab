@@ -1,0 +1,210 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class ContactDetails {
+  String name;
+  String gender;
+  DateTime dob;
+  String address;
+  String city;
+  String pinCode;
+
+  ContactDetails({
+    required this.name,
+    required this.gender,
+    required this.dob,
+    required this.address,
+    required this.city,
+    required this.pinCode,
+  });
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: ContactFormPage(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class ContactFormPage extends StatefulWidget {
+  @override
+  _ContactFormPageState createState() => _ContactFormPageState();
+}
+
+class _ContactFormPageState extends State<ContactFormPage> {
+  final _formKey = GlobalKey<FormState>();
+  final nameController = TextEditingController();
+  final addressController = TextEditingController();
+  final pinController = TextEditingController();
+  String gender = 'Male';
+  DateTime? dob;
+  String selectedCity = 'New York';
+
+  List<String> cities = ['New York', 'London', 'Delhi', 'Tokyo', 'Paris'];
+
+  void _selectDate(BuildContext context) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: dob ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        dob = picked;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  children: [
+                    Text("Contact details", style: TextStyle(fontSize: 24)),
+                    SizedBox(height: 20),
+
+                    Text("Name"),
+                    TextFormField(controller: nameController),
+
+                    SizedBox(height: 10),
+                    Text("Gender"),
+                    Row(
+                      children: [
+                        Radio<String>(
+                          value: 'Male',
+                          groupValue: gender,
+                          onChanged: (val) => setState(() => gender = val!),
+                        ),
+                        Text("Male"),
+                        Radio<String>(
+                          value: 'Female',
+                          groupValue: gender,
+                          onChanged: (val) => setState(() => gender = val!),
+                        ),
+                        Text("Female"),
+                      ],
+                    ),
+
+                    SizedBox(height: 10),
+                    Text("Date of birth"),
+                    ElevatedButton.icon(
+                      icon: Icon(Icons.calendar_today),
+                      label: Text(dob == null
+                          ? "Select DOB"
+                          : "${dob!.day}/${dob!.month}/${dob!.year}"),
+                      onPressed: () => _selectDate(context),
+                    ),
+
+                    SizedBox(height: 10),
+                    Text("Address"),
+                    TextFormField(controller: addressController),
+
+                    SizedBox(height: 10),
+                    Text("City"),
+                    DropdownButtonFormField<String>(
+                      value: selectedCity,
+                      items: cities
+                          .map((city) => DropdownMenuItem(
+                              child: Text(city), value: city))
+                          .toList(),
+                      onChanged: (val) => setState(() => selectedCity = val!),
+                    ),
+
+                    SizedBox(height: 10),
+                    Text("Pin Code"),
+                    TextFormField(
+                      controller: pinController,
+                      keyboardType: TextInputType.number,
+                    ),
+
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate() && dob != null) {
+                          final data = ContactDetails(
+                            name: nameController.text,
+                            gender: gender,
+                            dob: dob!,
+                            address: addressController.text,
+                            city: selectedCity,
+                            pinCode: pinController.text,
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DetailsPage(data: data),
+                            ),
+                          );
+                        }
+                      },
+                      child: Text("Submit"),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          VerticalDivider(),
+          Expanded(child: Container()), // Placeholder for second screen layout
+        ],
+      ),
+    );
+  }
+}
+
+class DetailsPage extends StatelessWidget {
+  final ContactDetails data;
+
+  DetailsPage({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          Expanded(child: Container()), // Placeholder for left screen
+          VerticalDivider(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("All details", style: TextStyle(fontSize: 24)),
+                  SizedBox(height: 20),
+                  Text("Name: ${data.name}"),
+                  Text("Gender: ${data.gender}"),
+                  Text(
+                      "Date of Birth: ${data.dob.day}/${data.dob.month}/${data.dob.year}"),
+                  Text("Address: ${data.address}"),
+                  Text("City: ${data.city}"),
+                  Text("Pin Code: ${data.pinCode}"),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("BACK"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
